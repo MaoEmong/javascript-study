@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>종합 실습</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #fafafa;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .search-box {
+        text-align: center;
+        padding: 30px;
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      input {
+        padding: 12px;
+        width: 300px;
+        font-size: 16px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        padding: 12px 25px;
+        margin: 5px;
+        cursor: pointer;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #0b7dda;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .photo-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        padding: 5px;
+      }
+      .photo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .photo-card .info {
+        padding: 15px;
+      }
+      .photo-card .title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      .photo-card .imgtext {
+        display: grid;
+        align-items: center;
+        text-align: center;
+        height: 200px;
+        font-size: 60px;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(135deg, #6a7cff, #9b59ff);
+      }
+      /* div {
+        border: 1px solid black;
+        padding: 0px;
+        margin: 0px;
+      } */
+    </style>
+  </head>
+  <body>
+    <h1>🎨 종합 실습: 한글 검색 앱</h1>
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="검색어를 입력하세요 (예: 사과, 딸기, 과일)"
+      />
+      <button onclick="searchItems()">검색</button>
+      <button onclick="clearResults()">초기화</button>
+    </div>
+    <div id="resultContainer" class="photo-grid"></div>
+
+    <script>
+      // 1. DOM에서 요소 찾기
+      const searchInput = document.querySelector("#searchInput");
+      const resultContainer = document.querySelector("#resultContainer");
+
+      // 한글 데이터
+      const items = [
+        {
+          id: 1,
+          name: "사과",
+          category: "과일",
+          description: "빨간색 과일입니다",
+        },
+        {
+          id: 2,
+          name: "딸기",
+          category: "과일",
+          description: "달콤한 빨간 과일입니다",
+        },
+        {
+          id: 3,
+          name: "바나나",
+          category: "과일",
+          description: "노란색 과일입니다",
+        },
+        {
+          id: 4,
+          name: "오렌지",
+          category: "과일",
+          description: "주황색 과일입니다",
+        },
+        {
+          id: 5,
+          name: "포도",
+          category: "과일",
+          description: "보라색 과일입니다",
+        },
+        {
+          id: 6,
+          name: "수박",
+          category: "과일",
+          description: "여름 과일입니다",
+        },
+        {
+          id: 7,
+          name: "당근",
+          category: "채소",
+          description: "주황색 채소입니다",
+        },
+        {
+          id: 8,
+          name: "토마토",
+          category: "채소",
+          description: "빨간색 채소입니다",
+        },
+        {
+          id: 9,
+          name: "오이",
+          category: "채소",
+          description: "초록색 채소입니다",
+        },
+        {
+          id: 10,
+          name: "양파",
+          category: "채소",
+          description: "노란색 채소입니다",
+        },
+        {
+          id: 11,
+          name: "고구마",
+          category: "채소",
+          description: "주황색 채소입니다",
+        },
+        {
+          id: 12,
+          name: "배추",
+          category: "채소",
+          description: "초록색 채소입니다",
+        },
+      ];
+
+      // 검색
+      function searchItems() {
+        let val = searchInput.value;
+        clearResults();
+        let itemList = [];
+        items.forEach((i) => {
+          if (
+            i.name.includes(val) ||
+            i.category == val ||
+            i.description.includes(val)
+          ) {
+            itemList.push(createSlot(i.name, i.category, i.description));
+          }
+        });
+      }
+
+      // 슬롯 만드는 함수
+      function createSlot(name, cate, description) {
+        let item = document.createElement("div");
+        item.setAttribute("class", "photo-card");
+        let imgtext = document.createElement("div");
+        imgtext.textContent = name;
+        imgtext.setAttribute("class", "imgtext");
+        item.prepend(imgtext);
+
+        let infobox = document.createElement("div");
+        let title = document.createElement("div");
+        let category = document.createElement("div");
+        let info = document.createElement("div");
+        title.textContent = name;
+        title.setAttribute("class", "title");
+        category.textContent = "카테고리 : " + cate;
+        info.textContent = description;
+        infobox.append(title);
+        infobox.append(category);
+        infobox.append(info);
+
+        item.append(infobox);
+
+        resultContainer.append(item);
+      }
+
+      // 초기화
+      function clearResults() {
+        resultContainer.innerHTML = "";
+      }
+
+      // 페이지 로드 시 전체 데이터 표시
+      window.onload = () => {
+        for (const item of items) {
+          if (item != undefined)
+            createSlot(item.name, item.category, item.description);
+        }
+      };
+    </script>
+  </body>
+</html>
