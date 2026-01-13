@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <style>
+      /* 모든 div 요소에 1px 검은색 테두리와 10px 패딩을 적용합니다. */
+      div {
+        border: 1px solid black;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 컨테이너 역할을 하는 div 요소입니다. -->
+    <div class="container">
+      <!-- ID가 'post-1'인 div 요소입니다. 여기에 데이터를 표시할 예정입니다. -->
+      <div id="post-1"></div>
+    </div>
+
+    <script>
+      // download 함수는 비동기적으로 데이터를 가져와서 HTML에 표시하는 역할을 합니다.
+      // 'async' 키워드는 이 함수가 비동기 작업을 포함하며 'await'를 사용할 수 있음을 나타냅니다.
+      async function download() {
+        // fetch API를 사용하여 "https://jsonplaceholder.typicode.com/posts/1"에서 데이터를 가져옵니다.
+        // 'await'는 fetch 요청이 완료될 때까지 함수의 실행을 일시 중지합니다.
+        let res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+        console.log(res); // 응답(Response) 객체를 콘솔에 출력합니다.
+
+        // 응답 헤더에서 'content-type' 값을 가져옵니다.
+        const contentType = res.headers.get("content-type");
+        console.log(contentType); // 'content-type'을 콘솔에 출력합니다.
+
+        // 응답 본문을 JSON 형식으로 파싱하여 JavaScript 객체로 변환합니다.
+        // 이 작업 또한 비동기이므로 'await'를 사용합니다.
+        let post = await res.json(); // json문자열을 javascript object로 변환
+        console.log(post); // 변환된 JavaScript 객체를 콘솔에 출력합니다.
+
+        // ID가 'post-1'인 DOM 요소를 선택합니다.
+        let dom = document.querySelector("#post-1");
+        // 선택된 DOM 요소의 내부 HTML을 백틱(`)을 사용한 템플릿 리터럴로 설정합니다.
+        // 이 템플릿 리터럴 내에서 ${} 문법을 사용하여 'post' 객체의 속성 값들을 삽입합니다.
+        dom.innerHTML = `
+            userId : ${post.userId} <br>
+            id : ${post.id} <br>
+            title : ${post.title} <br>
+            body : ${post.body} <br>
+        `;
+      }
+
+      // 페이지 로드 시 download 함수를 호출하여 데이터를 가져오고 표시합니다.
+      download();
+    </script>
+  </body>
+</html>
