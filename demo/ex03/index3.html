@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3. 반복문을 활용한 DOM 제어</title>
     <style>
+      /* CSS 스타일 정의: 페이지의 시각적인 요소를 꾸밉니다. */
       body {
         font-family: Arial, sans-serif;
         max-width: 800px;
@@ -41,6 +42,7 @@
   <body>
     <h1>3. 반복문을 활용한 DOM 제어 (Loop with DOM)</h1>
 
+    <!-- 각 예제를 위한 섹션 -->
     <div class="section">
       <h2>예제1: 기존 데이터 처음에 뿌리기</h2>
       <button onclick="displayOriginal()">기존 데이터 표시</button>
@@ -68,30 +70,37 @@
     </div>
 
     <script>
-      // 기존 데이터 컬렉션
+      // 기존 데이터 컬렉션 (배열)
       const list = ["사과", "딸기", "바나나", "오렌지"];
 
-      // 예제1: 기존 데이터 처음에 뿌리기
+      // 예제1: 기존 데이터를 forEach 반복문을 사용하여 화면에 표시하는 함수
       function displayOriginal() {
-        // 1. result1 찾기
+        // 1. 결과를 표시할 DOM 요소 (div#result1)를 찾습니다.
         let dom = document.querySelector("#result1");
-        // 2. 기존 result1에 데이터 초기화하기
+        // 2. 기존 'result1' 요소의 내부 내용을 초기화합니다. (이전 결과 지우기)
         dom.innerHTML = "";
-        // 3. list만큼 for문 돌면서 -> div class="item" 만들어서 append 하기
+        // 3. 'list' 배열의 각 요소를 순회하며 DOM 요소를 생성하고 추가합니다.
         list.forEach((i) => {
+          // 새로운 'div' 요소를 생성합니다.
           let myItem = document.createElement("div");
+          // 생성된 'div' 요소의 내부 HTML(텍스트)을 현재 배열 요소 'i'의 값으로 설정합니다.
           myItem.innerHTML = i;
+          // 생성된 'div' 요소에 'class' 속성을 'item'으로 설정합니다.
           myItem.setAttribute("class", "item");
 
+          // 'dom' 요소의 자식으로 'myItem' 요소를 추가합니다.
           dom.append(myItem);
         });
       }
 
-      // 예제2: map으로 수정해서 뿌리기
+      // 예제2: map 메서드를 사용하여 데이터를 수정한 후 화면에 표시하는 함수
       function displayWithMap() {
         let dom = document.querySelector("#result2");
         dom.innerHTML = "";
+        // 'map' 메서드를 사용하여 'list' 배열의 각 요소에 "[수정] " 접두사를 붙여 새로운 배열 'dataList'를 생성합니다.
+        // 원본 'list' 배열은 변경되지 않습니다.
         let dataList = list.map((i) => "[수정] " + i);
+        // 'dataList'의 각 요소를 순회하며 DOM 요소를 생성하고 추가합니다.
         dataList.forEach((i) => {
           let myItem = document.createElement("div");
           myItem.innerHTML = i;
@@ -101,11 +110,14 @@
         });
       }
 
-      // 예제3: 전개연산자로 추가해서 뿌리기
+      // 예제3: 전개 연산자(...)를 사용하여 데이터를 추가한 후 화면에 표시하는 함수
       function displayWithSpread() {
         let dom = document.querySelector("#result3");
         dom.innerHTML = "";
-        let dataList = [list[0], list[1], list[2], list[3], "포도", "수박"];
+        // 전개 연산자 '...'를 사용하여 'list' 배열의 모든 요소를 펼치고,
+        // 그 뒤에 "포도", "수박"을 추가하여 새로운 배열 'dataList'를 생성합니다.
+        let dataList = [...list, "포도", "수박"]; // list[0], list[1], list[2], list[3]는 list의 초기 요소들을 의미하는 것으로 보임.
+        // 'dataList'의 각 요소를 순회하며 DOM 요소를 생성하고 추가합니다.
         dataList.forEach((i) => {
           let myItem = document.createElement("div");
           myItem.innerHTML = i;
@@ -115,11 +127,14 @@
         });
       }
 
-      // 예제4: filter로 조건에 맞는 데이터 뿌리기
+      // 예제4: filter 메서드를 사용하여 조건에 맞는 데이터만 화면에 표시하는 함수
       function displayWithFilter() {
         let dom = document.querySelector("#result4");
         dom.innerHTML = "";
+        // 'filter' 메서드를 사용하여 'list' 배열에서 요소의 'length'(문자열 길이)가 2보다 큰 요소들만 필터링하여
+        // 새로운 배열 'dataList'를 생성합니다. (예: "사과", "바나나", "오렌지")
         let dataList = list.filter((i) => i.length > 2);
+        // 'dataList'의 각 요소를 순회하며 DOM 요소를 생성하고 추가합니다.
         dataList.forEach((i) => {
           let myItem = document.createElement("div");
           myItem.innerHTML = i;

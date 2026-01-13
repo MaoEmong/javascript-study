@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <style>
+      /* 모든 div 요소에 1px 검은색 테두리와 10px 패딩을 적용합니다. */
+      div {
+        border: 1px solid black;
+        padding: 10px;
+      }
+
+      /* 'container' 클래스를 가진 요소에 CSS Grid를 적용하여 반응형 3열 레이아웃을 만듭니다. */
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* 각 열이 동일한 너비를 가지도록 3개의 열을 정의합니다. */
+        gap: 10px; /* 그리드 항목들 사이에 10px의 간격을 둡니다. */
+      }
+
+      /* #user-1은 예시 ID로, 동적으로 생성되는 포스트 카드에 개별 스타일을 적용하기 위한 플레이스홀더로 보입니다. */
+      #user-1 {
+        border: 2px solid #4a90e2; /* 파란색 테두리 */
+        border-radius: 8px; /* 둥근 모서리 */
+        padding: 20px; /* 내부 여백 */
+        background: transparent; /* 투명 배경 */
+        transition: border-color 0.2s, box-shadow 0.2s; /* 테두리 색상 및 그림자 변화에 애니메이션 효과 */
+      }
+
+      /* #user-1 요소에 마우스를 올렸을 때의 스타일 변화 */
+      #user-1:hover {
+        border-color: #357abd; /* 테두리 색상 변경 */
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1); /* 그림자 효과 추가 */
+      }
+
+      /* 'meta-info' 클래스를 가진 요소의 스타일: 유연한 박스 모델(flexbox)을 사용하여 정보를 정렬합니다. */
+      .meta-info {
+        display: flex; /* flexbox 레이아웃 적용 */
+        gap: 15px; /* 항목들 사이에 15px 간격 */
+        margin-bottom: 12px; /* 하단 여백 */
+        font-size: 12px; /* 글꼴 크기 */
+        color: #666; /* 글꼴 색상 */
+      }
+
+      /* 'meta-item' 클래스를 가진 요소의 스타일: 각 메타 정보를 구분하는 배경 및 테두리 */
+      .meta-item {
+        background: transparent; /* 투명 배경 */
+        padding: 4px 10px; /* 내부 여백 */
+        border-radius: 12px; /* 둥근 모서리 */
+        font-weight: 500; /* 글꼴 두께 */
+        border: 1px solid #d0d0d0; /* 얇은 테두리 */
+      }
+
+      /* 'title' 클래스를 가진 요소의 스타일: 게시글 제목 */
+      .title {
+        font-size: 18px; /* 글꼴 크기 */
+        font-weight: bold; /* 글꼴 두께 */
+        color: #333; /* 글꼴 색상 */
+        margin-bottom: 12px; /* 하단 여백 */
+        line-height: 1.4; /* 줄 높이 */
+      }
+
+      /* 'body' 클래스를 가진 요소의 스타일: 게시글 내용 */
+      .body {
+        font-size: 14px; /* 글꼴 크기 */
+        color: #555; /* 글꼴 색상 */
+        line-height: 1.6; /* 줄 높이 */
+        text-align: justify; /* 양쪽 정렬 */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 사용자 입력 및 제어 버튼 -->
+    <div>
+      <input type="text" id="my-input" /> <!-- 삭제할 ID를 입력받는 텍스트 필드 -->
+      <button type="button" onclick="del()">id로 삭제</button><br /> <!-- 'del()' 함수를 호출하여 게시글을 삭제하는 버튼 -->
+      <button type="button" onclick="list()">전체목록</button><br /> <!-- 'list()' 함수를 호출하여 전체 목록을 표시하는 버튼 -->
+    </div>
+    <!-- 게시글 목록이 동적으로 로드될 컨테이너 -->
+    <div id="post-box" class="container"></div>
+
+    <script>
+      // --- 상태(State) 관리 변수들 ---
+      let state;    // 현재 화면에 렌더링되고 있는 게시글 데이터 (수정, 삭제 등으로 변경될 수 있음)
+      let prev;     // 서버로부터 처음 받아온 원본 게시글 데이터 (최초 상태, 변경되지 않음)
+      let next;     // 'state'가 변경될 예정인 다음 상태 (데이터 변경 작업 시 임시 저장)
+      let userData; // 게시글 작성자 정보를 저장할 변수
+
+      // 'list' 함수: 'prev'(최초 상태)에 저장된 모든 게시글을 화면에 다시 렌더링합니다.
+      function list() {
+        let dom = document.querySelector("#post-box"); // 게시글을 표시할 컨테이너 DOM 요소를 선택
+        dom.innerHTML = ""; // 컨테이너의 모든 자식 요소를 제거하여 화면을 비웁니다.
+
+        // 'prev' 배열에 저장된 각 게시글에 대해 'renderUserItem' 함수를 호출하여 화면에 추가합니다.
+        prev.forEach((post) => {
+          dom.append(renderUserItem(post));
+        });
+
+        state = prev; // 현재 상태('state')를 'prev'(최초 상태)로 갱신합니다.
+      }
+
+      // 'del' 함수: 입력된 ID에 해당하는 게시글을 현재 상태('state')에서 삭제하고 화면을 갱신합니다.
+      function del() {
+        // ID가 'my-input'인 입력 필드에서 삭제할 게시글의 ID를 가져옵니다.
+        let id = document.querySelector("#my-input").value;
+
+        // 유효성 검사 (원본 코드에서는 주석 처리되어 있었음)
+        // if (id == "") {
+        //   alert("삭제할 id를 입력하세요");
+        //   return;
+        // }
+
+        // 현재 상태('state')에서 입력된 'id'와 일치하지 않는 게시글들만 필터링하여 새로운 배열 'next'를 생성합니다.
+        next = state.filter((post) => post.id != id);
+        let dom = document.querySelector("#post-box"); // 게시글 컨테이너를 선택
+
+        // 'next'와 'state'의 길이를 비교하여 실제 삭제가 발생했는지 확인합니다.
+        if (next.length != state.length) {
+          state = next; // 변경이 있었다면 'state'를 'next'로 갱신합니다.
+          dom.innerHTML = ""; // 화면을 비웁니다.
+          // 갱신된 'state'의 각 게시글에 대해 'renderUserItem'을 호출하여 화면에 렌더링합니다.
+          state.forEach((post) => {
+            dom.append(renderUserItem(post));
+          });
+
+          // 상태가 변경되었으므로 'state'를 'next'로 다시 갱신합니다. (앞선 state = next와 중복)
+          state = next;
+        } else {
+          alert("변경된 데이터가 없어요"); // 삭제할 ID를 찾지 못했거나 이미 삭제된 경우
+        }
+
+        document.querySelector("#my-input").value = ""; // 입력 필드를 비웁니다.
+        document.querySelector("#my-input").focus(); // 입력 필드에 다시 포커스를 맞춥니다.
+      }
+
+      // 'renderUserItem' 함수: 하나의 게시글(post) 객체를 받아 HTML 요소를 생성하여 반환합니다.
+      // 이 함수는 'userData'에서 해당 게시글의 작성자 정보를 찾아 함께 표시합니다.
+      function renderUserItem(post) {
+        let item = document.createElement("div"); // 새로운 div 요소를 생성합니다.
+        // 'userData' 배열에서 현재 'post.userId'와 일치하는 'id'를 가진 사용자 정보를 찾습니다.
+        let user = userData.find((data) => data.id == post.userId);
+        // 생성된 div의 내부 HTML을 게시글 데이터와 사용자 정보로 채웁니다.
+        item.innerHTML = `<div class="meta-info">
+          <span class="meta-item">username: ${user.username}</span>
+          <span class="meta-item">name: ${user.name}</span>
+          <span class="meta-item">id: ${post.id}</span>
+        </div>
+        <div class="title">
+          ${post.title}
+        </div>
+        <div class="body">
+          ${post.body}
+        </div>`;
+        return item; // 생성된 게시글 카드 요소를 반환합니다.
+      }
+
+      // 'download' 함수: 서버로부터 모든 게시글 데이터와 사용자 데이터를 가져와 초기 화면을 구성합니다.
+      // (최초에 단 한번만 실행됨)
+      async function download() {
+        await downloadUserData(); // 먼저 사용자 정보를 비동기적으로 다운로드합니다. (완료될 때까지 대기)
+
+        // 1. fetch API를 사용하여 "https://jsonplaceholder.typicode.com/posts"에서 게시글 목록을 가져옵니다.
+        let res = await fetch("https://jsonplaceholder.typicode.com/posts");
+        // 2. 응답 본문을 JSON 형식으로 파싱하여 JavaScript 객체의 배열로 변환합니다.
+        let posts = await res.json();
+        prev = posts; // 가져온 게시글 데이터를 'prev'(최초 상태)에 저장합니다.
+        state = prev; // 'state'(현재 상태)도 'prev'와 동일하게 초기화합니다.
+
+        // 3. 게시글이 렌더링될 컨테이너 DOM 요소를 선택합니다.
+        let dom = document.querySelector("#post-box");
+
+        // 'state'의 각 게시글에 대해 'renderUserItem' 함수를 호출하여 카드를 생성하고 컨테이너에 추가합니다.
+        state.forEach((post) => {
+          dom.append(renderUserItem(post));
+        });
+      }
+
+      // 'downloadUserData' 함수: 서버로부터 사용자 데이터를 비동기적으로 가져와 'userData' 변수에 저장합니다.
+      async function downloadUserData() {
+        let res = await fetch("https://jsonplaceholder.typicode.com/users");
+        let posts = await res.json(); // 응답 본문을 JSON으로 파싱 (사용자 데이터)
+        userData = posts; // 가져온 사용자 데이터를 'userData' 변수에 저장합니다.
+      }
+
+      // 페이지 로드 시 'download' 함수를 호출하여 애플리케이션을 초기화하고 데이터를 표시합니다.
+      download();
+    </script>
+  </body>
+</html>

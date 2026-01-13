@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>종합 실습</title>
     <style>
+      /* CSS 스타일 정의: 페이지의 시각적인 요소를 꾸밉니다. */
       body {
         font-family: Arial, sans-serif;
         max-width: 900px;
@@ -95,22 +96,28 @@
     <h1>🎨 종합 실습: 한글 검색 앱</h1>
 
     <div class="search-box">
+      <!-- 검색어 입력을 위한 input 필드 -->
       <input
         type="text"
         id="searchInput"
         placeholder="검색어를 입력하세요 (예: 사과, 딸기, 과일)"
       />
+      <!-- 검색을 실행하는 버튼 -->
       <button onclick="searchItems()">검색</button>
+      <!-- 검색 결과를 초기화하는 버튼 -->
       <button onclick="clearResults()">초기화</button>
     </div>
+    <!-- 검색 결과를 표시할 컨테이너 -->
     <div id="resultContainer" class="photo-grid"></div>
 
     <script>
-      // 1. DOM에서 요소 찾기
+      // 1. DOM 요소 가져오기
+      // 'searchInput'은 검색 입력 필드를 참조합니다.
       const searchInput = document.querySelector("#searchInput");
+      // 'resultContainer'는 검색 결과를 동적으로 표시할 div 컨테이너를 참조합니다.
       const resultContainer = document.querySelector("#resultContainer");
 
-      // 한글 데이터
+      // 한글 데이터를 포함하는 배열 (검색 대상 데이터)
       const items = [
         {
           id: 1,
@@ -186,56 +193,73 @@
         },
       ];
 
-      // 검색
+      // 검색 기능을 수행하는 함수
       function searchItems() {
+        // 검색 입력 필드의 현재 값(value)을 가져옵니다.
         let val = searchInput.value;
+        // 기존 검색 결과를 모두 지웁니다.
         clearResults();
+        // 검색 조건에 맞는 항목들을 저장할 배열을 선언합니다.
         let itemList = [];
+
+        // 'items' 배열의 각 항목을 순회합니다.
         items.forEach((i) => {
+          // 검색어 'val'이 항목의 'name', 'category', 'description' 중 하나라도 포함되거나 일치하면
           if (
-            i.name.includes(val) ||
-            i.category == val ||
-            i.description.includes(val)
+            i.name.includes(val) ||       // 이름에 검색어 포함 여부
+            i.category == val ||          // 카테고리가 검색어와 일치 여부
+            i.description.includes(val)   // 설명에 검색어 포함 여부
           ) {
+            // 해당 항목에 대한 UI 슬롯(카드)을 생성하고 'itemList'에 추가합니다.
             itemList.push(createSlot(i.name, i.category, i.description));
           }
         });
       }
 
-      // 슬롯 만드는 함수
+      // 개별 항목에 대한 UI 슬롯(카드)을 생성하고 DOM에 추가하는 함수
       function createSlot(name, cate, description) {
+        // 'photo-card' 클래스를 가진 새로운 div 요소를 생성합니다.
         let item = document.createElement("div");
         item.setAttribute("class", "photo-card");
-        let imgtext = document.createElement("div");
-        imgtext.textContent = name;
-        imgtext.setAttribute("class", "imgtext");
-        item.prepend(imgtext);
 
+        // 항목의 이름 첫 글자를 표시할 'imgtext' div를 생성합니다.
+        let imgtext = document.createElement("div");
+        imgtext.textContent = name; // 이름을 텍스트 콘텐츠로 설정
+        imgtext.setAttribute("class", "imgtext"); // 'imgtext' 클래스 설정
+        item.prepend(imgtext); // 'photo-card'의 맨 앞에 'imgtext'를 추가합니다.
+
+        // 항목의 상세 정보를 담을 'infobox' div를 생성합니다.
         let infobox = document.createElement("div");
-        let title = document.createElement("div");
-        let category = document.createElement("div");
-        let info = document.createElement("div");
-        title.textContent = name;
-        title.setAttribute("class", "title");
-        category.textContent = "카테고리 : " + cate;
-        info.textContent = description;
+        let title = document.createElement("div");     // 제목 div
+        let category = document.createElement("div");  // 카테고리 div
+        let info = document.createElement("div");      // 설명 div
+
+        title.textContent = name;           // 제목 텍스트 설정
+        title.setAttribute("class", "title"); // 'title' 클래스 설정
+        category.textContent = "카테고리 : " + cate; // 카테고리 텍스트 설정
+        info.textContent = description;     // 설명 텍스트 설정
+
+        // 'infobox'에 제목, 카테고리, 설명을 순서대로 추가합니다.
         infobox.append(title);
         infobox.append(category);
         infobox.append(info);
 
-        item.append(infobox);
+        item.append(infobox); // 'photo-card'의 뒤에 'infobox'를 추가합니다.
 
-        resultContainer.append(item);
+        resultContainer.append(item); // 최종적으로 'resultContainer'에 완성된 'photo-card'를 추가합니다.
       }
 
-      // 초기화
+      // 검색 결과를 표시하는 영역을 초기화(비우는)하는 함수
       function clearResults() {
-        resultContainer.innerHTML = "";
+        resultContainer.innerHTML = ""; // 'resultContainer'의 모든 내부 HTML을 제거합니다.
       }
 
-      // 페이지 로드 시 전체 데이터 표시
+      // 웹 페이지가 로드될 때 실행되는 이벤트 핸들러
       window.onload = () => {
+        // 'items' 배열의 모든 항목에 대해 'createSlot' 함수를 호출하여 화면에 표시합니다.
+        // 이로 인해 페이지 로드 시 모든 데이터가 기본적으로 표시됩니다.
         for (const item of items) {
+          // 'item'이 'undefined'가 아닌 경우에만 슬롯을 생성합니다. (불필요한 검사일 수 있음, 배열 요소는 undefined가 아님)
           if (item != undefined)
             createSlot(item.name, item.category, item.description);
         }
