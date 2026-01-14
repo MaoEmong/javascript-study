@@ -206,9 +206,9 @@
         items.forEach((i) => {
           // 검색어 'val'이 항목의 'name', 'category', 'description' 중 하나라도 포함되거나 일치하면
           if (
-            i.name.includes(val) ||       // 이름에 검색어 포함 여부
-            i.category == val ||          // 카테고리가 검색어와 일치 여부
-            i.description.includes(val)   // 설명에 검색어 포함 여부
+            val.includes(i.name) || // 이름에 검색어 포함 여부
+            i.category == val || // 카테고리가 검색어와 일치 여부
+            i.description.includes(val) // 설명에 검색어 포함 여부
           ) {
             // 해당 항목에 대한 UI 슬롯(카드)을 생성하고 'itemList'에 추가합니다.
             itemList.push(createSlot(i.name, i.category, i.description));
@@ -230,14 +230,14 @@
 
         // 항목의 상세 정보를 담을 'infobox' div를 생성합니다.
         let infobox = document.createElement("div");
-        let title = document.createElement("div");     // 제목 div
-        let category = document.createElement("div");  // 카테고리 div
-        let info = document.createElement("div");      // 설명 div
+        let title = document.createElement("div"); // 제목 div
+        let category = document.createElement("div"); // 카테고리 div
+        let info = document.createElement("div"); // 설명 div
 
-        title.textContent = name;           // 제목 텍스트 설정
+        title.textContent = name; // 제목 텍스트 설정
         title.setAttribute("class", "title"); // 'title' 클래스 설정
         category.textContent = "카테고리 : " + cate; // 카테고리 텍스트 설정
-        info.textContent = description;     // 설명 텍스트 설정
+        info.textContent = description; // 설명 텍스트 설정
 
         // 'infobox'에 제목, 카테고리, 설명을 순서대로 추가합니다.
         infobox.append(title);
